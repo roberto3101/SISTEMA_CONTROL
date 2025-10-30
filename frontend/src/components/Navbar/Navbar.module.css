@@ -1,0 +1,71 @@
+.navbar {
+  height: 60px;
+  background: white;
+  border-bottom: 1px solid #e0e0e0;
+  position: fixed;
+  top: 0;
+  left: 260px;
+  right: 0;
+  z-index: 100;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.navbarContent {
+  height: 100%;
+  padding: 0 30px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.navbarTitle h1 {
+  font-size: 20px;
+  color: #2c3e50;
+  font-weight: 600;
+}
+
+.navbarRight {
+  display: flex;
+  align-items: center;
+  gap: 20px;
+}
+
+.userSection {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+}
+
+.greeting {
+  color: #555;
+  font-size: 14px;
+}
+
+.btnLogout {
+  padding: 8px 16px;
+  background: #e74c3c;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: background 0.3s;
+}
+
+.btnLogout:hover {
+  background: #c0392b;
+}
+
+@media (max-width: 768px) {
+  .navbar {
+    left: 0;
+  }
+  
+  .navbarTitle h1 {
+    font-size: 16px;
+  }
+  
+  .greeting {
+    display: none;
+  }
+}
