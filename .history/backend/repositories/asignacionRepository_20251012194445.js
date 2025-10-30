@@ -67,65 +67,60 @@ class AsignacionRepository {
     }
   }
 
-// Asignar cliente a vendedor
-async asignar(idVendedor, idCliente) {
-  try {
-    // Verificar si ya existe una asignación activa
-    const [existing] = await pool.query(
-      'SELECT * FROM asignacion_clientes WHERE id_cliente = ? AND estado = "activo"',
-      [idCliente]
-    );
+  // Asignar cliente a vendedor
+  async asignar(idVendedor, idCliente) {
+    try {
+      // Verificar si ya existe una asignación activa
+      const [existing] = await pool.query(
+        'SELECT * FROM asignacion_clientes WHERE id_cliente = ? AND estado = "activo"',
+        [idCliente]
+      );
 
-    if (existing.length > 0) {
-      throw new Error('El cliente ya está asignado a un vendedor');
+      if (existing.length > 0) {
+        throw new Error('El cliente ya está asignado a un vendedor');
+      }
+
+      const [result] = await pool.query(
+        'INSERT INTO asignacion_clientes (id_vendedor, id_cliente) VALUES (?, ?)',
+        [idVendedor, idCliente]
+      );
+
+      return result.insertId;
+    } catch (error) {
+      throw new Error(`Error al asignar cliente: ${error.message}`);
     }
-
-    // Eliminar asignaciones inactivas anteriores del mismo vendedor-cliente
-    await pool.query(
-      'DELETE FROM asignacion_clientes WHERE id_vendedor = ? AND id_cliente = ? AND estado = "inactivo"',
-      [idVendedor, idCliente]
-    );
-
-    const [result] = await pool.query(
-      'INSERT INTO asignacion_clientes (id_vendedor, id_cliente) VALUES (?, ?)',
-      [idVendedor, idCliente]
-    );
-
-    return result.insertId;
-  } catch (error) {
-    throw new Error(`Error al asignar cliente: ${error.message}`);
   }
-}
-// Reasignar cliente a otro vendedor
-async reasignar(idAsignacion, nuevoIdVendedor) {
-  try {
-    // Obtener el cliente de la asignación
-    const [asignacion] = await pool.query(
-      'SELECT id_cliente FROM asignacion_clientes WHERE id_asignacion = ?',
-      [idAsignacion]
-    );
 
-    if (asignacion.length === 0) {
-      throw new Error('Asignación no encontrada');
+  // Reasignar cliente a otro vendedor
+  async reasignar(idAsignacion, nuevoIdVendedor) {
+    try {
+      // Desactivar asignación actual
+      await pool.query(
+        'UPDATE asignacion_clientes SET estado = "inactivo" WHERE id_asignacion = ?',
+        [idAsignacion]
+      );
+
+      // Obtener el cliente de la asignación
+      const [asignacion] = await pool.query(
+        'SELECT id_cliente FROM asignacion_clientes WHERE id_asignacion = ?',
+        [idAsignacion]
+      );
+
+      if (asignacion.length === 0) {
+        throw new Error('Asignación no encontrada');
+      }
+
+      // Crear nueva asignación
+      const [result] = await pool.query(
+        'INSERT INTO asignacion_clientes (id_vendedor, id_cliente) VALUES (?, ?)',
+        [nuevoIdVendedor, asignacion[0].id_cliente]
+      );
+
+      return result.insertId;
+    } catch (error) {
+      throw new Error(`Error al reasignar cliente: ${error.message}`);
     }
-
-    // Eliminar asignación anterior
-    await pool.query(
-      'DELETE FROM asignacion_clientes WHERE id_asignacion = ?',
-      [idAsignacion]
-    );
-
-    // Crear nueva asignación
-    const [result] = await pool.query(
-      'INSERT INTO asignacion_clientes (id_vendedor, id_cliente) VALUES (?, ?)',
-      [nuevoIdVendedor, asignacion[0].id_cliente]
-    );
-
-    return result.insertId;
-  } catch (error) {
-    throw new Error(`Error al reasignar cliente: ${error.message}`);
   }
-}
 
   // Quitar asignación
   async quitar(idAsignacion) {
