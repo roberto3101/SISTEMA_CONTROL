@@ -142,4 +142,4 @@ Este proyecto es privado y confidencial.
 
 ## 📧 Contacto
 
-Para consultas: [tu-email@ejemplo.com]
+Para consultas: [jose0686534@gmail.com]
